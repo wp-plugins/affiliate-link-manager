@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /*
 
@@ -193,12 +193,13 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 		
 					update_option(self::CLASS_NAME . "_options", $options);
 				
+					/*
 					echo '<div id="message" class="updated">';
 		
 					echo '<p><strong>'. __('Settings has been saved successfully!',self::CLASS_NAME) . '</strong></p>';
 		
 					echo '</div>';	
-					
+					*/
 					//header("Location: admin.php?page=Anderson_Makiyama_Affiliate_Link_Manager_Report");
 					
 					echo "<script>window.onload = function(){document.location='admin.php?page=Anderson_Makiyama_Affiliate_Link_Manager_Report';}</script>";
