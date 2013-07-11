@@ -65,7 +65,7 @@
                     
                     
                     
-                    <td><?php echo $aff[0];?></td>
+                    <td style="max-width:400px; overflow:auto;"><?php echo $aff[0];?></td>
                     
                     <td>aff_<?php echo $aff[1];?></td>
                     
@@ -146,7 +146,7 @@
                     
                     <td><?php echo $view[1];?></td>
                     
-                    <td><?php echo $view[2];?></td>
+                    <td style="max-width:500px; overflow:auto;"><?php echo $view[2];?></td>
                     
                     
                     </tr>

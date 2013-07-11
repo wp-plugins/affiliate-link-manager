@@ -10,7 +10,7 @@ Description: Manage all of your affiliate links easily, short links using your o
 
 Author: Anderson Makiyama
 
-Version: 1.0
+Version: 1.1
 
 Author URI: http://plugin-wp.net
 
