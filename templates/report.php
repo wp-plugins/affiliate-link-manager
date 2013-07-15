@@ -222,7 +222,7 @@
 
                 <p>
 
-                <a href="http://plugin-wp.net/aff_hostgator" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/hostgator.jpg"></a>
+                <a href="<?php _e('http://plugin-wp.net/aff_hostgator',self::CLASS_NAME)?>" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/hostgator.jpg"></a>
 
 				</p>
 
