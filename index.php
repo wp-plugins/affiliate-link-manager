@@ -257,8 +257,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 	}		
 
 	public function check_post_slug( $slug, $post_ID, $post_status, $post_type, $post_parent, $original_slug){
-
-		if(!session_id()) session_start();
+		
 		
 		$nr_slug = isset($_SESSION[self::CLASS_NAME . "_nr_slug"])?$_SESSION[self::CLASS_NAME . "_nr_slug"]:1;
 		
@@ -395,6 +394,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 
 	public function log_views(){
+		if(!session_id()) session_start();
 
 		$parts = explode('/', $_SERVER['REQUEST_URI']);
 		$last = end($parts);
