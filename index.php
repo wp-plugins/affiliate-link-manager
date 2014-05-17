@@ -10,7 +10,7 @@ Description: Manage all of your affiliate links easily, short links using your o
 
 Author: Anderson Makiyama
 
-Version: 2.0
+Version: 2.0.1
 
 Author URI: http://plugin-wp.net
 
@@ -258,24 +258,28 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 	public function check_post_slug( $slug, $post_ID, $post_status, $post_type, $post_parent, $original_slug){
 		
-		
-		$nr_slug = isset($_SESSION[self::CLASS_NAME . "_nr_slug"])?$_SESSION[self::CLASS_NAME . "_nr_slug"]:1;
-		
-		$nr_slug++;
+		global $wpdb;
 		
 		$options = get_option(self::CLASS_NAME . "_options");
-		
-		foreach($options['afiliados'] as $aff){
 			
-			if($aff[1] == $_POST['palavra_chave']){
-				
-				return wp_unique_post_slug( $slug . "-" . $nr_slug, $post_ID, $post_status, $post_type, $post_parent );
-				break;
-			}
+		$serial_afiliados = serialize($options['afiliados']);
 		
+		if(strpos($serial_afiliados,'"'.$slug.'"') !== false){
+
+			$suffix = 2;
+			do {
+				$alt_post_name = _truncate_post_slug( $slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
+				$post_name_check = $wpdb->get_var( $wpdb->prepare( $check_sql, $alt_post_name, $post_ID, $post_parent ) );
+				$suffix++;
+				
+				if(strpos($serial_afiliados,'"'.$alt_post_name.'"') !== false) $post_name_check = "alguma coisa";
+				
+			} while ( $post_name_check );
+			
+			$slug = $alt_post_name;
+
 		}
 		
-		unset($_SESSION[self::CLASS_NAME . "_nr_slug"]);
 		return $slug;
 						
 	}
@@ -394,8 +398,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 
 	public function log_views(){
-		if(!session_id()) session_start();
-
+		
 		$parts = explode('/', $_SERVER['REQUEST_URI']);
 		$last = end($parts);
 		
@@ -422,7 +425,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 		
 		foreach($options['afiliados'] as $key => $aff){
 			
-			if($aff[1] == $keyword){
+			if(strtolower($aff[1]) == strtolower($keyword)){
 				
 				$options['afiliados'][$key][2] = $aff[2] + 1;
 				
@@ -450,7 +453,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 			
 			foreach($options['afiliados'] as $key => $aff){
 				
-				if($aff[1] == $keyword){
+				if(strtolower($aff[1]) == strtolower($keyword)){
 					
 					$options['afiliados'][$key][2] = $aff[2] + 1;
 					
@@ -555,10 +558,10 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 		return "";
 
 	}	
+		
 
 
 }
-
 
 
 if(!isset($anderson_makiyama)) $anderson_makiyama = array();
@@ -578,6 +581,5 @@ register_activation_hook( __FILE__, array($anderson_makiyama[$anderson_makiyama_
 add_action( 'plugins_loaded', array($anderson_makiyama[$anderson_makiyama_indice]->get_static_var('CLASS_NAME'), 'log_views') );
 
 add_filter( 'wp_unique_post_slug', array($anderson_makiyama[$anderson_makiyama_indice]->get_static_var('CLASS_NAME'), 'check_post_slug'),9999,6 );
-
 
 ?>

@@ -102,3 +102,9 @@ Yes, you can, just leave a comment at [Affiliate Link Manager](http://plugin-wp.
 * Added a checking when creating links, now if there is some post or page using the final url, the plugin don't create the link and inform you about it. 
 
 * When creating posts and pages, the plugin will check the final url (slug) and if there is an affiliate link using it, the system will give another slug to the post or page
+
+= 2.0.1 =
+
+* Fixed a case-sentivie issue related to keywords
+
+* Stopped working with session (nothing chances to you or to visitors)
