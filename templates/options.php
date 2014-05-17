@@ -23,7 +23,9 @@
  		<form action="" method="post">
 
         
-
+				<?php
+                 wp_nonce_field('add',self::CLASS_NAME);
+				?>
         <div class="metabox-holder">         
 
 		<div class="postbox" >
@@ -55,11 +57,11 @@
                 <tr>
                 
                 <td>
-                	<input type="text" name="url_afiliado" class="regular-text" /> 
+                	<input type="text" name="url_afiliado" class="regular-text" value="<?php if(isset($_POST['url_afiliado'])) echo $_POST['url_afiliado']?>" /> 
                 </td>
                 
                 <td>
-                	aff_<input type="text" name="palavra_chave" class="regular-text" />
+                	<input type="text" name="palavra_chave" class="regular-text" value="<?php if(isset($_POST['palavra_chave'])) echo $_POST['palavra_chave']?>" />
                 </td>
                 </tr>
                 </table>
@@ -106,7 +108,7 @@
 
             
 
-             <h3><?php _e('Best Wordpress Themes',self::CLASS_NAME)?>: <a href="http://plugin-wp.net/aff_elegantthemes" target="_blank">Elegant Themes</a></h3>
+             <h3><?php _e('Best Wordpress Themes',self::CLASS_NAME)?>: <a href="http://plugin-wp.net/elegantthemes" target="_blank">Elegant Themes</a></h3>
 
              
 
@@ -114,7 +116,7 @@
 
                 <p>
 
-                <a href="http://plugin-wp.net/aff_elegantthemes" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/elegantthemes.jpg" ></a>
+                <a href="http://plugin-wp.net/elegantthemes" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/elegantthemes.jpg" ></a>
 
 				</p>
 
@@ -130,7 +132,7 @@
 
 		<div class="postbox" >           
 
-            <h3><?php _e('Best Web Hosting for Wordpress',self::CLASS_NAME)?>: <a href="<?php _e('http://plugin-wp.net/aff_hostgator',self::CLASS_NAME)?>" target="_blank">Host Gator</a></h3>
+            <h3><?php _e('Best Autoresponder for Email Marketing',self::CLASS_NAME)?>: <a href="http://plugin-wp.net/trafficwave" target="_blank">TrafficWave</a></h3>
 
             
 
@@ -138,7 +140,7 @@
 
                 <p>
 
-                <a href="<?php _e('http://plugin-wp.net/aff_hostgator',self::CLASS_NAME)?>" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/hostgator.jpg"></a>
+                <a href="http://plugin-wp.net/trafficwave" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/trafficwave.jpg"></a>
 
 				</p>
 

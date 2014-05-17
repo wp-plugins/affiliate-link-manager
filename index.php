@@ -10,7 +10,7 @@ Description: Manage all of your affiliate links easily, short links using your o
 
 Author: Anderson Makiyama
 
-Version: 1.1
+Version: 2.0
 
 Author URI: http://plugin-wp.net
 
@@ -38,7 +38,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 	public static $PLUGIN_PAGE = self::PLUGIN_PAGE;
 
-	const PLUGIN_VERSION = '1.0';
+	const PLUGIN_VERSION = '2.0';
 
 	public static $PLUGIN_VERSION = self::PLUGIN_VERSION;
 
@@ -59,6 +59,12 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 	public function activation(){
 
+		$options = get_option(self::CLASS_NAME . "_options");
+		
+		if(!isset($options['afiliados'])) $options['afiliados'] = array(); 
+			
+		update_option(self::CLASS_NAME . "_options", $options);
+		
 	}
 
 	
@@ -119,6 +125,10 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 		 add_submenu_page(self::CLASS_NAME, self::PLUGIN_NAME,__('Report',self::CLASS_NAME),1, self::CLASS_NAME . "_Report", array(self::CLASS_NAME,'report_page'));
 		 
 		 add_submenu_page(self::CLASS_NAME, self::PLUGIN_NAME,__('Help page',self::CLASS_NAME),1, self::CLASS_NAME . "_Help", array(self::CLASS_NAME,'help_page'));
+		 
+		 global $submenu;
+		 if ( isset( $submenu[self::CLASS_NAME] ) )
+			$submenu[self::CLASS_NAME][0][0] = __('Add Links',self::CLASS_NAME);
 
 	}	
 
@@ -142,9 +152,18 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 
 		if ($_POST['submit']) {
+			
+			if(!wp_verify_nonce( $_POST[self::CLASS_NAME], 'add' ) ){
+				
+				print 'Sorry, your nonce did not verify.';
+  				exit;
+   
+			}
 
 			$_POST['url_afiliado'] = trim($_POST['url_afiliado']);
 			$_POST['palavra_chave'] = trim($_POST['palavra_chave']);
+			
+			$_POST['palavra_chave'] = sanitize_title($_POST['palavra_chave']);
 
 			if(empty($_POST['url_afiliado']) || empty($_POST['palavra_chave'])){
 				
@@ -160,6 +179,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 				//Verifica se o link ou palavra-chave já existe
 				foreach($options['afiliados'] as $aff){
 				
+					/* Desativado, várias campanhas podem direcionar para o mesmo url de afiliado
 					if($aff[0] == $_POST['url_afiliado']){
 						
 						echo '<div id="message" class="error">';
@@ -171,6 +191,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 						$duplicado = true;
 						
 					}
+					*/
 					
 					if($aff[1] == $_POST['palavra_chave']){
 						
@@ -181,29 +202,49 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 						echo '</div>';
 						
 						$duplicado = true;
-						
+						break;
 					}
 				
 				}
 				//
 
 				if(!$duplicado){ //Adiciona o novo url e palavra-chave
-					
-					$options['afiliados'][] = array($_POST['url_afiliado'],$_POST['palavra_chave'],0);
-		
-					update_option(self::CLASS_NAME . "_options", $options);
 				
-					/*
-					echo '<div id="message" class="updated">';
-		
-					echo '<p><strong>'. __('Settings has been saved successfully!',self::CLASS_NAME) . '</strong></p>';
-		
-					echo '</div>';	
-					*/
-					//header("Location: admin.php?page=Anderson_Makiyama_Affiliate_Link_Manager_Report");
+
+					//Verify if the post with slug already exists
+					$args=array(
+						'name' => $_POST['palavra_chave'],
+						'post_type' => 'any',
+						'posts_per_page' => 1
+					);
+					$my_posts = get_posts( $args );
 					
-					echo "<script>window.onload = function(){document.location='admin.php?page=Anderson_Makiyama_Affiliate_Link_Manager_Report';}</script>";
-				
+					if( $my_posts ) {//Existe post como mesmo slug
+						
+						echo '<div id="message" class="error">';
+			
+						echo '<p><strong>'. __('There is a Post or Page using this URL! Try another Keyword!',self::CLASS_NAME) . '</strong></p>';
+			
+						echo '</div>';
+						
+					}else{
+					
+						$options['afiliados'][] = array($_POST['url_afiliado'],$_POST['palavra_chave'],0);
+			
+						update_option(self::CLASS_NAME . "_options", $options);
+					
+						/*
+						echo '<div id="message" class="updated">';
+			
+						echo '<p><strong>'. __('Settings has been saved successfully!',self::CLASS_NAME) . '</strong></p>';
+			
+						echo '</div>';	
+						*/
+						//header("Location: admin.php?page=Anderson_Makiyama_Affiliate_Link_Manager_Report");
+						
+						echo "<script>window.onload = function(){document.location='admin.php?page=Anderson_Makiyama_Affiliate_Link_Manager_Report';}</script>";
+					
+					}
 				}
 
 
@@ -215,6 +256,30 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 	}		
 
+	public function check_post_slug( $slug, $post_ID, $post_status, $post_type, $post_parent, $original_slug){
+
+		if(!session_id()) session_start();
+		
+		$nr_slug = isset($_SESSION[self::CLASS_NAME . "_nr_slug"])?$_SESSION[self::CLASS_NAME . "_nr_slug"]:1;
+		
+		$nr_slug++;
+		
+		$options = get_option(self::CLASS_NAME . "_options");
+		
+		foreach($options['afiliados'] as $aff){
+			
+			if($aff[1] == $_POST['palavra_chave']){
+				
+				return wp_unique_post_slug( $slug . "-" . $nr_slug, $post_ID, $post_status, $post_type, $post_parent );
+				break;
+			}
+		
+		}
+		
+		unset($_SESSION[self::CLASS_NAME . "_nr_slug"]);
+		return $slug;
+						
+	}
 
 	public function help_page(){
 
@@ -227,15 +292,28 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 	public function report_page(){
 
+		global $anderson_makiyama, $user_level;
 
-		global $anderson_makiyama;
+		get_currentuserinfo();
 
+		if ($user_level < 10) { //Limita acesso para somente administradores
+
+			return;
+
+		}	
+		
 		$options = get_option(self::CLASS_NAME . "_options");
 		
 		//Verifica se é para excluir e se for, exclui
 		if ($_POST['submit'] && $_POST['keyword']) {
 
-			
+			if(!wp_verify_nonce( $_POST[self::CLASS_NAME], 'delete' ) ){
+				
+				print 'Sorry, your nonce did not verify.';
+  				exit;
+   
+			}
+						
 			$keyword = trim($_POST["keyword"]);
 			
 			if(empty($keyword)) return;
@@ -333,13 +411,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 			
 		if(empty($last)) return;
 		
-		if(strpos($last,'aff_') === false) return;
-
-		$keyword = str_replace('aff_','',$last);
-		
-		if(empty($keyword)) return;
-		
-		
+		$keyword = $last;
 		$options = get_option(self::CLASS_NAME . "_options");
 		
 		
@@ -366,8 +438,39 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 		//--
 		
 		
-		if(!$is_aff) return;
+		
+		//Verifica se retirando o aff_ existe o afiliado (compatibilidade com a versão antiga)
+		if(!$is_aff){
 
+			if(strpos($last,'aff_') === false) return;
+	
+			$keyword = self::str_replace_first('aff_','',$last);
+			
+			if(empty($keyword)) return;
+			
+			foreach($options['afiliados'] as $key => $aff){
+				
+				if($aff[1] == $keyword){
+					
+					$options['afiliados'][$key][2] = $aff[2] + 1;
+					
+					$is_aff = true;
+					
+					$link_do_afiliado = $aff[0];
+					
+					break;
+					
+				}
+				
+			}
+			 
+		}
+
+		//Afiliado não encontrado, então não faz nada
+		if(!$is_aff){
+			return;
+		}
+		
 		if(!isset($options["last_1000_views"])){
 			   
 
@@ -385,7 +488,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 		$today = date("d/m/Y H:i:s");
 			
-		$referrer = isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:'Direct Access';
+		$referrer = isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:__('Direct Access',self::CLASS_NAME);
 
 
 		$last_1000_views[] = array($keyword,$today,$referrer);
@@ -406,6 +509,15 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 	}
 
+	public static function str_replace_first($search, $replace, $subject) {
+    
+		$pos = strpos($subject, $search);
+		if ($pos !== false) {
+			$subject = substr_replace($subject, $replace, $pos, strlen($search));
+		}
+		return $subject;
+	
+	}
 	
 
 	public static function get_data_array($data,$part=''){
@@ -464,6 +576,8 @@ add_action( 'admin_enqueue_scripts', array($anderson_makiyama[$anderson_makiyama
 register_activation_hook( __FILE__, array($anderson_makiyama[$anderson_makiyama_indice]->get_static_var('CLASS_NAME'), 'activation') );
 
 add_action( 'plugins_loaded', array($anderson_makiyama[$anderson_makiyama_indice]->get_static_var('CLASS_NAME'), 'log_views') );
+
+add_filter( 'wp_unique_post_slug', array($anderson_makiyama[$anderson_makiyama_indice]->get_static_var('CLASS_NAME'), 'check_post_slug'),9999,6 );
 
 
 ?>

@@ -67,14 +67,17 @@
                     
                     <td style="max-width:400px; overflow:auto;"><?php echo $aff[0];?></td>
                     
-                    <td>aff_<?php echo $aff[1];?></td>
+                    <td><?php echo $aff[1];?></td>
                     
                     <td><?php echo $aff[2];?></td>
                     
-                    <td><input type="text" value="<?php bloginfo('siteurl'); echo '/aff_' . $aff[1];?>" class="regular-text" onclick="this.select();" /></td>
+                    <td><input type="text" value="<?php bloginfo('siteurl'); echo '/' . $aff[1];?>" class="regular-text" readonly="readonly" onclick="this.select();" /></td>
                     
                     <td>
                     <form action="" method="post">
+                    <?php
+                 	wp_nonce_field('delete',self::CLASS_NAME);
+					?>
                     <input type="hidden" name="keyword" value="<?php echo $aff[1]?>" />
                     <input type="submit" name="submit" value="Delete" class="button-primary" />
                     </form>
@@ -142,7 +145,7 @@
 
                     <tr class='<?php echo $class;?>'>
                     
-                    <td>aff_<?php echo $view[0];?></td>
+                    <td><?php echo $view[0];?></td>
                     
                     <td><?php echo $view[1];?></td>
                     
@@ -190,7 +193,7 @@
 
             
 
-             <h3><?php _e('Best Wordpress Themes',self::CLASS_NAME)?>: <a href="http://plugin-wp.net/aff_elegantthemes" target="_blank">Elegant Themes</a></h3>
+             <h3><?php _e('Best Wordpress Themes',self::CLASS_NAME)?>: <a href="http://plugin-wp.net/elegantthemes" target="_blank">Elegant Themes</a></h3>
 
              
 
@@ -198,7 +201,7 @@
 
                 <p>
 
-                <a href="http://plugin-wp.net/aff_elegantthemes" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/elegantthemes.jpg" ></a>
+                <a href="http://plugin-wp.net/elegantthemes" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/elegantthemes.jpg" ></a>
 
 				</p>
 
@@ -214,7 +217,7 @@
 
 		<div class="postbox" >           
 
-            <h3><?php _e('Best Web Hosting for Wordpress',self::CLASS_NAME)?>: <a href="<?php _e('http://plugin-wp.net/aff_hostgator',self::CLASS_NAME)?>" target="_blank">Host Gator</a></h3>
+            <h3><?php _e('Best Autoresponder for Email Marketing',self::CLASS_NAME)?>: <a href="http://plugin-wp.net/trafficwave" target="_blank">TrafficWave</a></h3>
 
             
 
@@ -222,7 +225,7 @@
 
                 <p>
 
-                <a href="<?php _e('http://plugin-wp.net/aff_hostgator',self::CLASS_NAME)?>" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/hostgator.jpg"></a>
+                <a href="http://plugin-wp.net/trafficwave" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/trafficwave.jpg"></a>
 
 				</p>
 
