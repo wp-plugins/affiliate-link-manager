@@ -7,9 +7,6 @@
 <h2><?php echo self::PLUGIN_NAME?> <?php echo __('Reports', self::CLASS_NAME)?>:</h2>
 
 
-
-
-
 <p><?php _e('See the reports on this page:',self::CLASS_NAME)?></p>
 
     
@@ -34,25 +31,8 @@
 
                 <p>
 
-					<table class='tabelas'>
-                    
-                    <tr>
-                    
-                    <th>
-                    <?php _e('Affiliate Url',self::CLASS_NAME);?>
-                    </th>
-                    <th>
-                    <?php _e('Keyword',self::CLASS_NAME);?>
-                    </th>
-                    <th>
-                    <?php _e('Views',self::CLASS_NAME);?>
-                    </th>
-                    <th>
-                    <?php _e('Link for Share',self::CLASS_NAME);?>
-                    </th>
-                    <td>
-                    </td>
-                    </tr>
+					
+					<table class='tabelas' width="100%">
                     
                 	<?php
 
@@ -60,31 +40,56 @@
 					
 						$class = $class == 'tr-blue'?'tr-green':'tr-blue';
 					?>
-
-                    <tr class='<?php echo $class;?>'>
-                    
-                    
-                    
-                    <td style="max-width:400px; overflow:auto;"><?php echo $aff[0];?></td>
-                    
-                    <td><?php echo $aff[1];?></td>
-                    
-                    <td><?php echo $aff[2];?></td>
-                    
-                    <td><input type="text" value="<?php bloginfo('siteurl'); echo '/' . $aff[1];?>" class="regular-text" readonly="readonly" onclick="this.select();" /></td>
+                    <form action="" method="post">
+                    <tr>
                     
                     <td>
-                    <form action="" method="post">
+                   
+                    </td>
+                    <td>
+                    
+                    </td>
+                     <td rowspan="5">
+                    <input type="submit" name="submit" value="Update" class="button-primary" /><br /><br />
+                    <input type="submit" name="submit" value="Delete" style="background-color:red;" class="button-primary" />
+                    </td>                   
+                    </tr>
+                                        
+					<form action="" method="post">                   
+                    <tr class='<?php echo $class;?>'>
+                    
+                    <td style="max-width:400px; overflow:auto;"><?php _e('Link for Share',self::CLASS_NAME);?>: <input type="text" class="regular-text" onclick="javascript:this.select();" value="<?php bloginfo('siteurl'); echo '/' . $aff[1];?>" readonly="readonly"></td>
+                    
+                    <td><?php _e('Views',self::CLASS_NAME);?>: <?php echo $aff[2];?></td>
+                    
+                    </tr>
+                    <tr class='<?php echo $class;?>'>
+                    <td colspan="2">
+                    <?php _e('Keyword',self::CLASS_NAME)?>:  <input name="keyword" class="regular-text code" type="text" value="<?php if(isset($aff[1])) echo $aff[1];?>" />
+                    <input name="keywordoriginal" class="regular-text code" type="hidden" value="<?php if(isset($aff[1])) echo $aff[1];?>" />
+                    </td>
+                    </tr>     
+                     <tr class='<?php echo $class;?>'>
+                    <td colspan="2">
+                    <?php _e('Affiliate Url',self::CLASS_NAME)?>:  <input name="affiliate" class="regular-text code" type="text" value="<?php if(isset($aff[0])) echo $aff[0];?>" />
+                    </td>
+                    </tr>                                   
+                    <tr class='<?php echo $class;?>'>
+                    <td colspan="2">
+                    <?php _e('Description',self::CLASS_NAME)?>:  <textarea name="descricao" class="large-text code"><?php if(isset($aff[3])) echo $aff[3];?></textarea>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td colspan="2">
+                    
                     <?php
                  	wp_nonce_field('delete',self::CLASS_NAME);
 					?>
-                    <input type="hidden" name="keyword" value="<?php echo $aff[1]?>" />
-                    <input type="submit" name="submit" value="Delete" class="button-primary" />
-                    </form>
                     </td>
                     
                     </tr>
 
+                    </form>
                     <?php
 
 					endforeach;
@@ -177,69 +182,16 @@
 
         <td style="vertical-align:top; width:410px">
 
-        
-
-        <div class="metabox-holder">
-
-		<div class="postbox" >
-
-        
-
-        	<h3 style="font-size:24px; text-transform:uppercase;color:#F00;">
-
-        	<?php _e('Take a Look!',self::CLASS_NAME);?>
-
-            </h3>
-
-            
-
-             <h3><?php _e('Best Wordpress Themes',self::CLASS_NAME)?>: <a href="http://plugin-wp.net/elegantthemes" target="_blank">Elegant Themes</a></h3>
-
-             
-
-        	<div class="inside">
-
-                <p>
-
-                <a href="http://plugin-wp.net/elegantthemes" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/elegantthemes.jpg" ></a>
-
-				</p>
-
-
-
-			</div>
-
- 
- 		</div>
-        </div>
-        
          <div class="metabox-holder">
+        
+        <div class="postbox" >
+       
 
-		<div class="postbox" >           
+		<iframe src="http://plugin-wp.net/banners/?l=<?php echo $lang?>" width="400" height="800" frameborder="0" scrolling="no"></iframe>
+  
 
-            <h3><?php _e('Best Autoresponder for Email Marketing',self::CLASS_NAME)?>: <a href="http://plugin-wp.net/trafficwave" target="_blank">TrafficWave</a></h3>
-
-            
-
-        	<div class="inside">
-
-                <p>
-
-                <a href="http://plugin-wp.net/trafficwave" target="_blank"><img src="<?php echo $anderson_makiyama[self::PLUGIN_ID]->plugin_url?>images/trafficwave.jpg"></a>
-
-				</p>
-
-
-
-			</div> 
-
-                        
-
-		</div>
-
-        </div>
-
-              
+         </div>
+        </div>             
 
        </td>
 

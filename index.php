@@ -10,7 +10,7 @@ Description: Manage all of your affiliate links easily, short links using your o
 
 Author: Anderson Makiyama
 
-Version: 2.0.1
+Version: 2.1
 
 Author URI: http://plugin-wp.net
 
@@ -19,7 +19,6 @@ Author URI: http://plugin-wp.net
 
 
 class Anderson_Makiyama_Affiliate_Link_Manager{
-
 
 
 	const CLASS_NAME = 'Anderson_Makiyama_Affiliate_Link_Manager';
@@ -116,12 +115,13 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 		if (function_exists('add_submenu_page')){ //Adiciona pagina na seção plugins
 
-			add_submenu_page( "plugins.php",self::PLUGIN_NAME,self::PLUGIN_NAME,1, self::CLASS_NAME, array(self::CLASS_NAME,'options_page'));			  
+			add_submenu_page( "plugins.php",self::PLUGIN_NAME,self::PLUGIN_NAME,1, self::CLASS_NAME, array(self::CLASS_NAME,'add_links_page'));			  
 
 		}
 
-  		 add_menu_page(self::PLUGIN_NAME, self::PLUGIN_NAME,1, self::CLASS_NAME,array(self::CLASS_NAME,'options_page'), plugins_url('/images/icon.png', __FILE__));
+  		 add_menu_page(self::PLUGIN_NAME, self::PLUGIN_NAME,1, self::CLASS_NAME,array(self::CLASS_NAME,'add_links_page'), plugins_url('/images/icon.png', __FILE__));
 
+		 
 		 add_submenu_page(self::CLASS_NAME, self::PLUGIN_NAME,__('Report',self::CLASS_NAME),1, self::CLASS_NAME . "_Report", array(self::CLASS_NAME,'report_page'));
 		 
 		 add_submenu_page(self::CLASS_NAME, self::PLUGIN_NAME,__('Help page',self::CLASS_NAME),1, self::CLASS_NAME . "_Help", array(self::CLASS_NAME,'help_page'));
@@ -134,6 +134,21 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 
 	public function options_page(){
+
+
+		global $anderson_makiyama, $wpdb, $user_ID, $user_level, $user_login;
+
+		get_currentuserinfo();
+
+
+		if ($user_level < 10) { //Limita acesso para somente administradores
+
+			return;
+
+		}	
+	}
+	
+	public function add_links_page(){
 
 
 		global $anderson_makiyama, $wpdb, $user_ID, $user_level, $user_login;
@@ -164,6 +179,8 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 			$_POST['palavra_chave'] = trim($_POST['palavra_chave']);
 			
 			$_POST['palavra_chave'] = sanitize_title($_POST['palavra_chave']);
+			
+			$_POST['descricao'] = htmlspecialchars($_POST['descricao']);
 
 			if(empty($_POST['url_afiliado']) || empty($_POST['palavra_chave'])){
 				
@@ -229,7 +246,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 						
 					}else{
 					
-						$options['afiliados'][] = array($_POST['url_afiliado'],$_POST['palavra_chave'],0);
+						$options['afiliados'][] = array($_POST['url_afiliado'],$_POST['palavra_chave'],0,$_POST['descricao']);
 			
 						update_option(self::CLASS_NAME . "_options", $options);
 					
@@ -251,8 +268,9 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 			}
 
 		}
-
-		include("templates/options.php");
+		
+		$lang=get_bloginfo("language");
+		include("templates/addlinks.php");
 
 	}		
 
@@ -307,35 +325,126 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 		
 		$options = get_option(self::CLASS_NAME . "_options");
 		
-		//Verifica se é para excluir e se for, exclui
-		if ($_POST['submit'] && $_POST['keyword']) {
-
+		
+		if ($_POST['submit'] && $_POST['keywordoriginal']) {
+	
 			if(!wp_verify_nonce( $_POST[self::CLASS_NAME], 'delete' ) ){
 				
 				print 'Sorry, your nonce did not verify.';
-  				exit;
+				exit;
    
 			}
-						
-			$keyword = trim($_POST["keyword"]);
+
+			$keyword = trim($_POST["keywordoriginal"]);
 			
 			if(empty($keyword)) return;
 			
 			$afiliados = $options["afiliados"];
 			
-			foreach($afiliados as $key => $aff){
+													
+			switch($_POST["submit"]){//Verifica se é para excluir ou atualizar
 				
-				if($keyword == $aff[1]){
+				case "Delete":
+	
+					foreach($afiliados as $key => $aff){
+						
+						if($keyword == $aff[1]){
+							
+							unset($afiliados[$key]);
+							
+							$afiliados = array_values($afiliados);
+							
+							$options['afiliados'] = $afiliados;
+							
+							update_option(self::CLASS_NAME . "_options", $options);
+							
+						}
+					}
+			
+				break;
+				case "Update":
+					$descricao = htmlspecialchars($_POST["descricao"]);
+					$new_keyword = trim($_POST["keyword"]);
+					$affiliate_url = trim($_POST["affiliate"]);
+
+
+					//Verifica se o link ou palavra-chave já existe, mas só usuario mudou o keyword
+					$duplicado = false;
+					if($keyword != $new_keyword){
+						foreach($options['afiliados'] as $aff){
+		
+							
+							if($aff[1] == $new_keyword){
+								
+								echo '<div id="message" class="error">';
 					
-					unset($afiliados[$key]);
+								echo '<p><strong>'. __('The Keyword already exists!',self::CLASS_NAME) . '</strong></p>';
 					
-					$afiliados = array_values($afiliados);
+								echo '</div>';
+								
+								$duplicado = true;
+								break;
+							}
+						
+						}
+
+						if(!$duplicado){
+							
+							//Verify if the post with slug already exists
+							$args=array(
+								'name' => $new_keyword,
+								'post_type' => 'any',
+								'posts_per_page' => 1
+							);
+							$my_posts = get_posts( $args );
+							
+							if( $my_posts ) {//Existe post como mesmo slug
+								
+								echo '<div id="message" class="error">';
 					
-					$options['afiliados'] = $afiliados;
+								echo '<p><strong>'. __('There is a Post or Page using this URL! Try another Keyword!',self::CLASS_NAME) . '</strong></p>';
 					
-					update_option(self::CLASS_NAME . "_options", $options);
+								echo '</div>';
+								
+								$duplicado = true;
+							}
+							
+						}
+										
+											
+					}
 					
-				}
+					//
+				
+					if(!$duplicado)	{	
+								
+						foreach($afiliados as $key => $aff){
+							
+							if($keyword == $aff[1]){
+								
+								$afiliados[$key][0] = $affiliate_url;
+								$afiliados[$key][1] = $new_keyword;
+								$afiliados[$key][3] = $descricao;
+								
+								$options['afiliados'] = $afiliados;
+								
+								update_option(self::CLASS_NAME . "_options", $options);
+
+								
+								echo '<div id="message" class="updated">';
+					
+								echo '<p><strong>'. __('The Link has been updated successfully!',self::CLASS_NAME) . '</strong></p>';
+					
+								echo '</div>';	
+								
+														
+							}
+						}
+						
+					}
+										
+				break;
+				
 			}
 		}
 		//--
@@ -365,6 +474,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 		$afiliados = array_reverse($afiliados);
 
+		$lang=get_bloginfo("language");
 		include("templates/report.php");
 
 	}		
