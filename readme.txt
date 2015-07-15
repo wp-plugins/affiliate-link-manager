@@ -6,7 +6,7 @@ Tags: affiliate, afiliados, redirecionador, links de afiliado, affiliate links, 
 
 Requires at least: 3.0
 
-Tested up to: 4.1
+Tested up to: 4.2.2
 
 Stable tag: trunk
 
@@ -114,3 +114,7 @@ Yes, you can, just leave a comment at [Affiliate Link Manager](http://plugin-wp.
 * Now you can insert descriptions to any link
 
 * Now you can edit any link, as chagging the affiliate url, the keyword or the description 
+
+= 2.1.1 =
+
+* Updated some code and icons

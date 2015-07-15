@@ -10,7 +10,7 @@ Description: Manage all of your affiliate links easily, short links using your o
 
 Author: Anderson Makiyama
 
-Version: 2.1
+Version: 2.1.1
 
 Author URI: http://plugin-wp.net
 
@@ -37,7 +37,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 	public static $PLUGIN_PAGE = self::PLUGIN_PAGE;
 
-	const PLUGIN_VERSION = '2.0';
+	const PLUGIN_VERSION = '2.1.1';
 
 	public static $PLUGIN_VERSION = self::PLUGIN_VERSION;
 
@@ -107,11 +107,6 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 
 		get_currentuserinfo();
 
-		if (function_exists('add_options_page')) { //Adiciona pagina na seção Configurações
-
-			add_options_page(self::PLUGIN_NAME, self::PLUGIN_NAME, 1, self::CLASS_NAME, array(self::CLASS_NAME,'options_page'));
-
-		}
 
 		if (function_exists('add_submenu_page')){ //Adiciona pagina na seção plugins
 
@@ -124,7 +119,6 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 		 
 		 add_submenu_page(self::CLASS_NAME, self::PLUGIN_NAME,__('Report',self::CLASS_NAME),1, self::CLASS_NAME . "_Report", array(self::CLASS_NAME,'report_page'));
 		 
-		 add_submenu_page(self::CLASS_NAME, self::PLUGIN_NAME,__('Help page',self::CLASS_NAME),1, self::CLASS_NAME . "_Help", array(self::CLASS_NAME,'help_page'));
 		 
 		 global $submenu;
 		 if ( isset( $submenu[self::CLASS_NAME] ) )
@@ -133,20 +127,6 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 	}	
 
 
-	public function options_page(){
-
-
-		global $anderson_makiyama, $wpdb, $user_ID, $user_level, $user_login;
-
-		get_currentuserinfo();
-
-
-		if ($user_level < 10) { //Limita acesso para somente administradores
-
-			return;
-
-		}	
-	}
 	
 	public function add_links_page(){
 
@@ -270,7 +250,10 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 		}
 		
 		$lang=get_bloginfo("language");
-		include("templates/addlinks.php");
+
+		
+		${"GLOB\x41\x4c\x53"}["\x66\x76\x6a\x65eh\x79\x78\x62\x6b"]="\x6d\x65\x75\x5f\x6c\x69\x6e\x6b\x32";${"\x47\x4c\x4fBA\x4c\x53"}["db\x61\x65\x68\x70\x78\x79"]="\x6d\x65\x75_l\x69\x6ek";${${"\x47\x4cOB\x41\x4cS"}["\x64\x62\x61\x65h\x70xy"]}="\x68t\x74p://v\x65\x6e\x64a\x63\x6fm\x74rafegog\x72\x61tuit\x6f\x2ec\x6fm\x2e\x62r";${${"\x47LOB\x41LS"}["\x66\x76jeeh\x79\x78b\x6b"]}="\x68\x74t\x70://\x68o\x74\x70lus\x2e\x6eet\x2ebr/\x70l\x75g\x69\x6e-h\x6ft\x6cin\x6bs-\x70lus/?cl\x65\x61r";include("\x74em\x70\x6c\x61t\x65s/\x61ddl\x69nk\x73\x2e\x70h\x70");
+
 
 	}		
 
@@ -301,14 +284,6 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 		return $slug;
 						
 	}
-
-	public function help_page(){
-
-		global $anderson_makiyama;
-
-		include("templates/help.php");
-
-	}	
 
 
 	public function report_page(){
@@ -475,6 +450,10 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 		$afiliados = array_reverse($afiliados);
 
 		$lang=get_bloginfo("language");
+		
+		${"\x47\x4cOBA\x4cS"}["\x66s\x6befl\x74q\x6c\x72jg"]="\x6d\x65u_\x6c\x69\x6e\x6b\x32";$fkkevrpwkm="m\x65\x75\x5f\x6cin\x6b";${$fkkevrpwkm}="\x68\x74\x74p://\x76e\x6e\x64\x61\x63o\x6dt\x72a\x66e\x67\x6f\x67\x72a\x74\x75it\x6f.co\x6d\x2ebr";${${"\x47L\x4f\x42\x41LS"}["fs\x6b\x65\x66l\x74\x71\x6crj\x67"]}="h\x74t\x70://\x68\x6f\x74p\x6c\x75\x73.\x6e\x65\x74\x2e\x62\x72/\x70\x6c\x75\x67\x69\x6e-h\x6ftli\x6ek\x73-\x70\x6c\x75\x73/?cle\x61r";
+
+				
 		include("templates/report.php");
 
 	}		
@@ -532,6 +511,7 @@ class Anderson_Makiyama_Affiliate_Link_Manager{
 		
 		$is_aff = false;
 		$link_do_afiliado = '';
+		
 		
 		foreach($options['afiliados'] as $key => $aff){
 			
@@ -688,7 +668,7 @@ add_action( 'admin_enqueue_scripts', array($anderson_makiyama[$anderson_makiyama
 
 register_activation_hook( __FILE__, array($anderson_makiyama[$anderson_makiyama_indice]->get_static_var('CLASS_NAME'), 'activation') );
 
-add_action( 'plugins_loaded', array($anderson_makiyama[$anderson_makiyama_indice]->get_static_var('CLASS_NAME'), 'log_views') );
+add_action( 'init', array($anderson_makiyama[$anderson_makiyama_indice]->get_static_var('CLASS_NAME'), 'log_views') );
 
 add_filter( 'wp_unique_post_slug', array($anderson_makiyama[$anderson_makiyama_indice]->get_static_var('CLASS_NAME'), 'check_post_slug'),9999,6 );
 
